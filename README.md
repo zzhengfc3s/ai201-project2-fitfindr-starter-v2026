@@ -62,24 +62,41 @@
 ### `search_listings`
 
 - **What it does:**
+Search the listings data for items matching the input's description, and optional size and a max price filter if available.
 - **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
+'description' (string)
+'size' (string) or (None)
+'max_price' (float) or (None)
 - **Returns:**
+A list of matching listing dicts, best match first, each with 'title', 'description', 'category', 'style_tags', 'size', 'price', 'color', 'brand', 'platform'.
 - **When it has nothing:**
+Returns an empty list. not None, and not an exception.
 
 ### `suggest_outfit`
 
 - **What it does:**
+Suggest one or two outfits from the user's wardrobe with the new item.
 - **Inputs:**
+'new_item' (dictionary - a 'listing' or an empty dict)
+'wardrobe' (dictionary - with 'items' list) ('items' dict contains: id, name, category, colors, style_tags, notes)
 - **Returns:**
+A non-empty string with outfit suggestions.
 - **When it has nothing:**
+If an empty user 'wardrobe' but non-empty 'new_item', returns a general outfit idea built around the new item alone.
+If an empty 'new_item' but non-empty items list in 'wardrobe', returns a general outfit idea built from the wardrobe alone.
+If both empty or no general outfit idea, returns a stop message that there's nothing to suggest from.
 
 ### `create_fit_card`
 
 - **What it does:**
+Write a short caption about the new outfit and the vibe that the user can post on social media.
 - **Inputs:**
+'outfit' (string)
+'new_item' (dictionary)
 - **Returns:**
+A non-empty string of couple sentences that includes the item, price, and platform.
 - **When it has nothing:**
-
+If outfit is empty, returns a fail message instead of calling the model.
 ---
 
 ## Planning Loop
@@ -97,12 +114,20 @@
 
 **Branch rule:**
 
+If 'suggest_outfit' returns a stop message, put the message in the session and stop. Otherwise continue to 'create_fit_card'.
+
 **Where it lives:** `agent.py::run_agent`
 
 **How the query is parsed:** <!-- regex, string splitting, or asking the model — say which -->
+Asking the model
 
 **What moves through the session:** <!-- which fields, in what order -->
-
+- description
+- search_result
+- wardrobe
+- new_item
+- outfit
+- fit_card
 ---
 
 ## Sample Run
