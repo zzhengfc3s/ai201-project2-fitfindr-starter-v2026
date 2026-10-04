@@ -28,7 +28,7 @@ tool calls and returns a fit card — in at least 4 of 5 tries.
 <!-- Why 4 of 5 and not 5 of 5? Something about your search, probably —
      "my search is a plain keyword match and some phrasings will miss" is a
      real answer. -->
-
+A model parsing a query could sometimes misinterpret the description so we can't have a strict target of 5/5.
 ---
 
 ## 2. An impossible query stops before the second tool
@@ -39,7 +39,7 @@ Given a query that matches no listings, the agent stops before calling
 **Why this target:**
 <!-- Why is 5 of 5 reasonable here when criterion 1 isn't? What's different
      about this path? -->
-
+5 of 5 is a reasonable target because it's a binary test here (the return value of searching_listing is empty or not) where-else criterion 1 can fail due to model misinterpretation or keyword matching failing due to spelling, etc... which is outside our control
 ---
 
 ## 3. Something about state
@@ -54,11 +54,11 @@ Given a query that matches no listings, the agent stops before calling
      compares session["selected_item"] against what actually reached
      suggest_outfit is the shape you're after. -->
 
-
+Given a query that matches at least one listing, the agent passes the selected item to the next two tool call in 5 out of 5 tries.
 
 **Why this target:**
 
-
+We can target 5/5 because session state is deterministic (single source of truth) for a run.
 
 ---
 
@@ -75,11 +75,11 @@ Given a query that matches no listings, the agent stops before calling
      sentence? A card longer than a caption anyone would post? Any of those can
      be turned into a number. -->
 
-
+Given a valid caption (non-empty string and no fail message) produced by 'create_fit_card', it includes price and platform in 5 out of 5 tries.
 
 **Why this target:**
 
-
+We can target 5/5 even though we are asking a model because we can ground the prompt to explicity include static data such as price and platform.
 
 ---
 
@@ -92,11 +92,11 @@ Given a query that matches no listings, the agent stops before calling
      search respects a price ceiling — anything, as long as it names a number
      or an observable outcome. -->
 
-
+Given a query with a price ceiling, search results from 'search_listing' contains only items where it's price is less than or equal to max price in 5 out of 5 tries.
 
 **Why this target:**
 
-
+We can target 5/5 because it's a numerical comparison.
 
 ---
 
