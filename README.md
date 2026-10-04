@@ -77,14 +77,12 @@ Returns an empty list. not None, and not an exception.
 - **What it does:**
 Suggest one or two outfits from the user's wardrobe with the new item.
 - **Inputs:**
-'new_item' (dictionary - a 'listing' or an empty dict)
+'new_item' (dictionary)
 'wardrobe' (dictionary - with 'items' list) ('items' dict contains: id, name, category, colors, style_tags, notes)
 - **Returns:**
 A non-empty string with outfit suggestions.
 - **When it has nothing:**
-If an empty user 'wardrobe' but non-empty 'new_item', returns a general outfit idea built around the new item alone.
-If an empty 'new_item' but non-empty items list in 'wardrobe', returns a general outfit idea built from the wardrobe alone.
-If both empty or no general outfit idea, returns a stop message that there's nothing to suggest from.
+Returns an empty string. not None, and not an exception.
 
 ### `create_fit_card`
 
@@ -114,7 +112,7 @@ If outfit is empty, returns a fail message instead of calling the model.
 
 **Branch rule:**
 
-If 'suggest_outfit' returns a stop message, put the message in the session and stop. Otherwise continue to 'create_fit_card'.
+If 'search_listing' returns an empty list, put the message 'STOP Session' in the session and stop. Otherwise take the first result and go to suggest_outfit.
 
 **Where it lives:** `agent.py::run_agent`
 
@@ -128,6 +126,16 @@ Asking the model
 - new_item
 - outfit
 - fit_card
+---
+
+## Stretch Feature: A second branch
+Based on Milestone 3, criterion 2, my initial branching rule was wrong so I adjusted the tool spec from previous commit and adjusted the branching rules.
+
+**Branch rule:**
+
+If 'suggest_outfit' returns an empty string, put the message 'STOP Session' in the session and stop. Otherwise continue to 'create_fit_card'.
+
+**Where it lives:** `agent.py::run_agent`
 ---
 
 ## Sample Run
