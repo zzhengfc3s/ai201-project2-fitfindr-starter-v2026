@@ -157,16 +157,44 @@ $ python app.py ask '...'
 ```
 $ python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
 
+'[(2, {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 2000s baby tee with butterfly graphic. Fitted crop length. Tag says medium but fits like a small.', 'category': 'tops', 'style_tags': ['y2k', 'vintage', 'graphic tee', 'cottagecore'], 'size': 'S/M', 'condition': 'excellent', 'price': 18.0, 'colors': ['white', 'pink', 'purple'], 'brand': None,'platform': 'depop'}), (2, {'id': 'lst_006', 'title': 'Graphic Tee — 2003 Tour Bootleg Style', 'description': 'Vintage-style bootleg tee with faded graphic. Slightly boxy fit. 100% cotton, soft and worn-in.', 'category': 'tops', 'style_tags': ['graphic tee', 'vintage', 'grunge', 'streetwear', 'band tee'], 'size': 'L', 'condition': 'good', 'price': 24.0, 'colors': ['black'], 'brand': None, 'platform': 'depop'}), (2, {'id': 'lst_017', 'title': 'Mesh Long-Sleeve Top — Black', 'description': 'Sheer black mesh long-sleeve. Great for layering under a graphic tee or over a bralette. Stretchy material, fits true to size.', 'category': 'tops', 'style_tags': ['y2k', 'grunge', 'goth', 'layering'], 'size': 'S/M', 'condition': 'excellent', 'price': 15.0, 'colors': ['black'], 'brand': None, 'platform': 'depop'}), (2, {'id': 'lst_033', 'title': 'Vintage Band Tee — Faded Grey', 'description': 'Faded grey band-style tee with distressed graphic. Crew neck. Fits boxy. Well-loved but no holes or major damage.', 'category': 'tops', 'style_tags': ['vintage', 'grunge', 'band tee', 'graphic tee', 'streetwear'], 'size': 'L', 'condition': 'fair', 'price': 19.0, 'colors': ['grey', 'charcoal'], 'brand': None, 'platform': 'depop'}), (1, {'id': 'lst_011', 'title': 'Low-Rise Cargo Pants — Khaki', 'description': 'Y2K era low-rise cargo pants. Lots of pockets. Khaki color, slightly distressed at the hems. Great for layering with a long tee.', 'category': 'bottoms', 'style_tags': ['y2k', 'cargo', '2000s', 'streetwear'], 'size': 'W29', 'condition': 'fair', 'price': 27.0, 'colors': ['khaki', 'tan'], 'brand': None, 'platform': 'poshmark'}), (1, {'id': 'lst_015', 'title': 'Vintage Graphic Hoodie — Faded Black', 'description': 'Faded black pullover hoodie with barely-visible vintage graphic on the chest. Cozy interior. Some pilling but adds to the worn-in look.', 'category': 'tops', 'style_tags': ['vintage', 'grunge', 'graphic', 'streetwear'], 'size': 'L', 'condition':'fair', 'price': 26.0, 'colors': ['black', 'charcoal'], 'brand': None, 'platform': 'depop'})]'
 ```
 
 ```
-$ python -c "from tools import suggest_outfit; ..."
+$ python -c 'from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_example_wardrobe()))'
 
+'Here are two outfit combinations using the **Vintage Levi's 501 Jeans — Medium Wash** and pieces from your wardrobe:
+
+### Outfit 1: The Casual Streetwear Staple
+* **Thrifted Item:** Vintage Levi's 501 Jeans — Medium Wash
+* **Wardrobe Pieces:** 
+  * White ribbed tank top
+  * Oversized grey crewneck sweatshirt (layered)
+  * Chunky white sneakers
+  * Black crossbody bag
+  * Brown leather belt
+
+**Why it works & How to style it:**
+This outfit balances fitted and oversized proportions for an effortless, everyday streetwear look. Start by tucking the **white ribbed tank top** into the **Vintage Levi's 501 Jeans** and cinching the waist with the **brown leather belt** to add a warm contrast to the blue denim. Throw the **oversized grey crewneck sweatshirt** over your shoulders or wear it on top for that cozy, relaxed vibe. Finish the fit with the **chunky white sneakers** to tie in the bright white of the tank, and sling the **black crossbody bag** across your chest to keep your essentials handy.
+
+---
+
+### Outfit 2: Edgy Vintage Contrast
+* **Thrifted Item:** Vintage Levi's 501 Jeans — Medium Wash
+* **Wardrobe Pieces:** 
+  * Black cropped zip hoodie
+  * Vintage black denim jacket
+  * Black combat boots
+  * Black crossbody bag
+
+**Why it works & How to style it:**
+The medium wash of the vintage 501s acts as a great contrast to an all-black upper half, making the denim pop while leaning into your grunge and vintage style tags. Layer the **black cropped zip hoodie** underneath the **vintage black denim jacket**—the contrast between the cropped zip-up and the slightly cropped jacket creates cool dimension. Pair the whole look with the **black combat boots** tucked slightly or resting over the hems of the jeans for a tough, grounded finish, and carry the **black crossbody bag** to keep the accessories sleek and minimal.'
 ```
 
 ```
-$ python -c "from tools import create_fit_card; ..."
+$ python -c "from tools import create_fit_card; from utils.data_loader import load_listings; print(create_fit_card('jeans and white sneakers', load_listings()[0]))"
 
+Nothing beats finding the holy grail of denim while scrolling on Depop late at night! These Vintage Levi's 501 Jeans in a medium wash were only $38.0, and they give off the ultimate effortless 90s off-duty vibe. I paired them with my go-to white sneakers for a look that's cool, comfy, and completely secondhand.
 ```
 
 ---
@@ -183,8 +211,50 @@ $ python -c "from tools import create_fit_card; ..."
 **Moment 1**
 
 - *What I asked for:*
+Here are five acceptance criteria for a multi-tool agent. For each one, tell me exactly how you would test it using only what the sentence says. Don't suggest improvements — just tell me what you'd do.
 - *What came back:*
+Each test below uses only what the criterion states. Where the sentence leaves something undefined, I note the assumption I'd make.
+
+1. Matching query completes all three tool calls and returns a fit card (4 of 5)
+
+Pick one query that matches at least one listing.
+Run the agent 5 times with that query.
+For each run, check the tool-call log for all three calls (search_listing, suggest_outfit, create_fit_card) and check that a fit card is returned.
+A run passes only if all three calls happened and a fit card came back.
+The criterion passes if at least 4 of the 5 runs pass.
+
+2. Non-matching query stops before suggest_outfit and names what to change (5 of 5)
+
+Pick one query that matches no listings.
+Run the agent 5 times with that query.
+For each run, check two things: suggest_outfit was never called, and the returned message names something to change (for example, the price ceiling or a keyword).
+A run passes only if both hold.
+The criterion passes only if all 5 runs pass.
+
+3. Selected item is passed to the next two tool calls (5 of 5)
+
+Pick one query that matches at least one listing.
+Run the agent 5 times.
+For each run, record the item the agent selected from the search results, then inspect the inputs of suggest_outfit and create_fit_card in the tool-call log.
+A run passes only if both calls received that same selected item.
+The criterion passes only if all 5 runs pass.
+
+4. Valid caption includes price and platform (5 of 5)
+
+Run create_fit_card 5 times with a matching query's selected item, where the item has a known price and platform.
+Keep only outputs that are valid, meaning the caption is a non-empty string and not a fail message. (Assumption: if a run produces an invalid caption, it doesn't count toward the 5, so I'd rerun until I have 5 valid captions.)
+For each valid caption, check that the item's price and platform both appear in the text.
+The criterion passes only if all 5 valid captions contain both.
+
+5. Price-ceiling query returns only items at or under the max price (5 of 5)
+
+Pick one query with a stated max price, ideally one where the listings include items above and below that price.
+Run search_listing 5 times with that query.
+For each run, check every returned item's price against the max price.
+A run passes only if every item's price is less than or equal to the max.
+The criterion passes only if all 5 runs pass.
 - *What I changed:*
+Nothing was changed.
 
 **Moment 2**
 
