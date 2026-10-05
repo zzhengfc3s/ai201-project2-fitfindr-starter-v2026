@@ -130,16 +130,6 @@ Asking the model
 - fit_card
 ---
 
-## Stretch Feature: A second branch
-Based on Milestone 3, criterion 2, my initial branching rule was wrong so I adjusted the tool spec from previous commit and adjusted the branching rules.
-
-**Branch rule:**
-
-If 'suggest_outfit' returns an empty string, put the message 'STOP Session' in the session and stop. Otherwise continue to 'create_fit_card'.
-
-**Where it lives:** `agent.py::run_agent`
----
-
 ## Sample Run
 
 <!-- Two things go here.
@@ -152,7 +142,6 @@ If 'suggest_outfit' returns an empty string, put the message 'STOP Session' in t
 ```
 $ python app.py ask '90s track jacket in size M'
 
-'
   Found:    90s Track Jacket — Navy/White Stripe — $45.0 on poshmark
 
   Outfit:   Here are two outfit combinations featuring the **90s Track Jacket — Navy/White Stripe** and pieces from your wardrobe:
@@ -185,7 +174,7 @@ Tuck a fitted top (like your white ribbed tank) into the khaki trousers, secure 
 
   Fit card: Scored this vintage 90s Track Jacket — Navy/White Stripe on Poshmark for just $45.0, and it instantly unlocked the ultimate sporty-meets-minimalist prep vibe! I paired it with wide-leg khakis and chunky sneakers for an effortless high-low mix that feels so fresh. Sustainable style has never looked this cool. ✨
 
-3 model calls this session, 1095 prompt + 478 output tokens'
+3 model calls this session, 1095 prompt + 478 output tokens
 ```
 
 **The three tools, tested one at a time**
@@ -193,13 +182,13 @@ Tuck a fitted top (like your white ribbed tank) into the khaki trousers, secure 
 ```
 $ python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
 
-'[(2, {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 2000s baby tee with butterfly graphic. Fitted crop length. Tag says medium but fits like a small.', 'category': 'tops', 'style_tags': ['y2k', 'vintage', 'graphic tee', 'cottagecore'], 'size': 'S/M', 'condition': 'excellent', 'price': 18.0, 'colors': ['white', 'pink', 'purple'], 'brand': None,'platform': 'depop'}), (2, {'id': 'lst_006', 'title': 'Graphic Tee — 2003 Tour Bootleg Style', 'description': 'Vintage-style bootleg tee with faded graphic. Slightly boxy fit. 100% cotton, soft and worn-in.', 'category': 'tops', 'style_tags': ['graphic tee', 'vintage', 'grunge', 'streetwear', 'band tee'], 'size': 'L', 'condition': 'good', 'price': 24.0, 'colors': ['black'], 'brand': None, 'platform': 'depop'}), (2, {'id': 'lst_017', 'title': 'Mesh Long-Sleeve Top — Black', 'description': 'Sheer black mesh long-sleeve. Great for layering under a graphic tee or over a bralette. Stretchy material, fits true to size.', 'category': 'tops', 'style_tags': ['y2k', 'grunge', 'goth', 'layering'], 'size': 'S/M', 'condition': 'excellent', 'price': 15.0, 'colors': ['black'], 'brand': None, 'platform': 'depop'}), (2, {'id': 'lst_033', 'title': 'Vintage Band Tee — Faded Grey', 'description': 'Faded grey band-style tee with distressed graphic. Crew neck. Fits boxy. Well-loved but no holes or major damage.', 'category': 'tops', 'style_tags': ['vintage', 'grunge', 'band tee', 'graphic tee', 'streetwear'], 'size': 'L', 'condition': 'fair', 'price': 19.0, 'colors': ['grey', 'charcoal'], 'brand': None, 'platform': 'depop'}), (1, {'id': 'lst_011', 'title': 'Low-Rise Cargo Pants — Khaki', 'description': 'Y2K era low-rise cargo pants. Lots of pockets. Khaki color, slightly distressed at the hems. Great for layering with a long tee.', 'category': 'bottoms', 'style_tags': ['y2k', 'cargo', '2000s', 'streetwear'], 'size': 'W29', 'condition': 'fair', 'price': 27.0, 'colors': ['khaki', 'tan'], 'brand': None, 'platform': 'poshmark'}), (1, {'id': 'lst_015', 'title': 'Vintage Graphic Hoodie — Faded Black', 'description': 'Faded black pullover hoodie with barely-visible vintage graphic on the chest. Cozy interior. Some pilling but adds to the worn-in look.', 'category': 'tops', 'style_tags': ['vintage', 'grunge', 'graphic', 'streetwear'], 'size': 'L', 'condition':'fair', 'price': 26.0, 'colors': ['black', 'charcoal'], 'brand': None, 'platform': 'depop'})]'
+[(2, {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 2000s baby tee with butterfly graphic. Fitted crop length. Tag says medium but fits like a small.', 'category': 'tops', 'style_tags': ['y2k', 'vintage', 'graphic tee', 'cottagecore'], 'size': 'S/M', 'condition': 'excellent', 'price': 18.0, 'colors': ['white', 'pink', 'purple'], 'brand': None,'platform': 'depop'}), (2, {'id': 'lst_006', 'title': 'Graphic Tee — 2003 Tour Bootleg Style', 'description': 'Vintage-style bootleg tee with faded graphic. Slightly boxy fit. 100% cotton, soft and worn-in.', 'category': 'tops', 'style_tags': ['graphic tee', 'vintage', 'grunge', 'streetwear', 'band tee'], 'size': 'L', 'condition': 'good', 'price': 24.0, 'colors': ['black'], 'brand': None, 'platform': 'depop'}), (2, {'id': 'lst_017', 'title': 'Mesh Long-Sleeve Top — Black', 'description': 'Sheer black mesh long-sleeve. Great for layering under a graphic tee or over a bralette. Stretchy material, fits true to size.', 'category': 'tops', 'style_tags': ['y2k', 'grunge', 'goth', 'layering'], 'size': 'S/M', 'condition': 'excellent', 'price': 15.0, 'colors': ['black'], 'brand': None, 'platform': 'depop'}), (2, {'id': 'lst_033', 'title': 'Vintage Band Tee — Faded Grey', 'description': 'Faded grey band-style tee with distressed graphic. Crew neck. Fits boxy. Well-loved but no holes or major damage.', 'category': 'tops', 'style_tags': ['vintage', 'grunge', 'band tee', 'graphic tee', 'streetwear'], 'size': 'L', 'condition': 'fair', 'price': 19.0, 'colors': ['grey', 'charcoal'], 'brand': None, 'platform': 'depop'}), (1, {'id': 'lst_011', 'title': 'Low-Rise Cargo Pants — Khaki', 'description': 'Y2K era low-rise cargo pants. Lots of pockets. Khaki color, slightly distressed at the hems. Great for layering with a long tee.', 'category': 'bottoms', 'style_tags': ['y2k', 'cargo', '2000s', 'streetwear'], 'size': 'W29', 'condition': 'fair', 'price': 27.0, 'colors': ['khaki', 'tan'], 'brand': None, 'platform': 'poshmark'}), (1, {'id': 'lst_015', 'title': 'Vintage Graphic Hoodie — Faded Black', 'description': 'Faded black pullover hoodie with barely-visible vintage graphic on the chest. Cozy interior. Some pilling but adds to the worn-in look.', 'category': 'tops', 'style_tags': ['vintage', 'grunge', 'graphic', 'streetwear'], 'size': 'L', 'condition':'fair', 'price': 26.0, 'colors': ['black', 'charcoal'], 'brand': None, 'platform': 'depop'})]
 ```
 
 ```
 $ python -c 'from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_example_wardrobe()))'
 
-'Here are two outfit combinations using the **Vintage Levi's 501 Jeans — Medium Wash** and pieces from your wardrobe:
+Here are two outfit combinations using the **Vintage Levi's 501 Jeans — Medium Wash** and pieces from your wardrobe:
 
 ### Outfit 1: The Casual Streetwear Staple
 * **Thrifted Item:** Vintage Levi's 501 Jeans — Medium Wash
@@ -224,7 +213,7 @@ This outfit balances fitted and oversized proportions for an effortless, everyda
   * Black crossbody bag
 
 **Why it works & How to style it:**
-The medium wash of the vintage 501s acts as a great contrast to an all-black upper half, making the denim pop while leaning into your grunge and vintage style tags. Layer the **black cropped zip hoodie** underneath the **vintage black denim jacket**—the contrast between the cropped zip-up and the slightly cropped jacket creates cool dimension. Pair the whole look with the **black combat boots** tucked slightly or resting over the hems of the jeans for a tough, grounded finish, and carry the **black crossbody bag** to keep the accessories sleek and minimal.'
+The medium wash of the vintage 501s acts as a great contrast to an all-black upper half, making the denim pop while leaning into your grunge and vintage style tags. Layer the **black cropped zip hoodie** underneath the **vintage black denim jacket**—the contrast between the cropped zip-up and the slightly cropped jacket creates cool dimension. Pair the whole look with the **black combat boots** tucked slightly or resting over the hems of the jeans for a tough, grounded finish, and carry the **black crossbody bag** to keep the accessories sleek and minimal.
 ```
 
 ```
@@ -250,6 +239,7 @@ Nothing beats finding the holy grail of denim while scrolling on Depop late at n
 Here are five acceptance criteria for a multi-tool agent. For each one, tell me exactly how you would test it using only what the sentence says. Don't suggest improvements — just tell me what you'd do.
 
 - *What came back:*
+```
 Each test below uses only what the criterion states. Where the sentence leaves something undefined, I note the assumption I'd make.
 
 1. Matching query completes all three tool calls and returns a fit card (4 of 5)
@@ -290,6 +280,7 @@ Run search_listing 5 times with that query.
 For each run, check every returned item's price against the max price.
 A run passes only if every item's price is less than or equal to the max.
 The criterion passes only if all 5 runs pass.
+```
 
 - *What I changed:*
 Nothing was changed, these testing steps looks like it can be automated mechanically.
@@ -302,6 +293,7 @@ No results found. Please try a different query.
 Here is the message an app shows me when my search returns nothing. I know nothing about how the app works. Tell me what I would try next after reading it. If the honest answer is that I'd have no idea what to try, say that. Don't rewrite the message for me.
 
 - *What came back:*
+```
 After reading it, you'd try a different search, but you'd be guessing. The message tells you what happened (nothing matched) and gives you one instruction ("try a different query"), but nothing about *what kind* of different.
 
 Here's what you'd likely do, in order:
@@ -313,6 +305,7 @@ Here's what you'd likely do, in order:
 Past that, you'd have no idea. The message doesn't say whether the app searches titles only or everything, whether it wants exact matches, whether filters are silently narrowing your results, or whether the thing you want just isn't there. So you can't tell whether to change your wording, loosen a setting, or give up. And "No results found" doesn't distinguish between "your search was wrong" and "this content doesn't exist," so you may keep trying variations long after there's anything to find.
 
 So the honest answer: you'd have a vague sense to try simpler or different words, but no real direction. "Try a different query" is the app telling you to guess again.
+```
 
 - *What I changed:*
 
