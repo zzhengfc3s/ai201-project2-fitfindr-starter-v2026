@@ -43,7 +43,9 @@
 
 <!-- Three or four sentences: what a user asks for, and what they get back. -->
 
-
+The user can query the agent with descriptions or keywords of outfit pieces they're interested in.
+The agent will search the listings database and suggest 1-2 outfits based on the user's query and user's wardrobe.
+From the suggested outfits, the agent will create a social media style post using one of the suggested outfit.
 
 ---
 
@@ -148,8 +150,42 @@ If 'suggest_outfit' returns an empty string, put the message 'STOP Session' in t
 **One full query**
 
 ```
-$ python app.py ask '...'
+$ python app.py ask '90s track jacket in size M'
 
+'
+  Found:    90s Track Jacket — Navy/White Stripe — $45.0 on poshmark
+
+  Outfit:   Here are two outfit combinations featuring the **90s Track Jacket — Navy/White Stripe** and pieces from your wardrobe:
+
+### Outfit 1: The Ultimate 90s Streetwear Look
+* **Top:** White ribbed tank top
+* **Bottoms:** Baggy straight-leg jeans, dark wash
+* **Shoes:** Chunky white sneakers
+* **Accessories:** Black crossbody bag
+
+**Why it works:** 
+This look leans entirely into the vintage, athletic streetwear vibe of the track jacket. Layering the navy jacket zipped halfway over the fitted white tank creates a great contrast in proportions against the baggy, high-waisted dark wash jeans. 
+
+**How to style it:**
+Wear the track jacket slightly unzipped to show off the white tank underneath, which ties in with the white stripes on the sleeves and the chunky white sneakers. Let the jeans pool slightly over your sneakers for an authentic 90s slouch. Finish the look with the black crossbody bag worn across the chest for hands-free utility.
+
+***
+
+### Outfit 2: Sporty Meets Minimalist Prep
+* **Bottoms:** Wide-leg khaki trousers
+* **Accessories:** Brown leather belt
+* **Shoes:** Chunky white sneakers
+* *(Optional layering piece: White ribbed tank top tucked underneath)*
+
+**Why it works:**
+Mixing athletic pieces with tailored separates is a classic high-low styling trick. The navy track jacket brings a sporty edge, while the wide-leg khaki trousers and brown belt ground the outfit with a clean, minimal earth-tone base. 
+
+**How to style it:**
+Tuck a fitted top (like your white ribbed tank) into the khaki trousers, secure it with the brown leather belt, and wear the track jacket fully unzipped as an outer layer. Pair with the chunky white sneakers to keep the overall silhouette modern, relaxed, and effortlessly cool.
+
+  Fit card: Scored this vintage 90s Track Jacket — Navy/White Stripe on Poshmark for just $45.0, and it instantly unlocked the ultimate sporty-meets-minimalist prep vibe! I paired it with wide-leg khakis and chunky sneakers for an effortless high-low mix that feels so fresh. Sustainable style has never looked this cool. ✨
+
+3 model calls this session, 1095 prompt + 478 output tokens'
 ```
 
 **The three tools, tested one at a time**
@@ -212,6 +248,7 @@ Nothing beats finding the holy grail of denim while scrolling on Depop late at n
 
 - *What I asked for:*
 Here are five acceptance criteria for a multi-tool agent. For each one, tell me exactly how you would test it using only what the sentence says. Don't suggest improvements — just tell me what you'd do.
+
 - *What came back:*
 Each test below uses only what the criterion states. Where the sentence leaves something undefined, I note the assumption I'd make.
 
@@ -253,14 +290,33 @@ Run search_listing 5 times with that query.
 For each run, check every returned item's price against the max price.
 A run passes only if every item's price is less than or equal to the max.
 The criterion passes only if all 5 runs pass.
+
 - *What I changed:*
-Nothing was changed.
+Nothing was changed, these testing steps looks like it can be automated mechanically.
 
 **Moment 2**
 
 - *What I asked for:*
+No results found. Please try a different query.
+
+Here is the message an app shows me when my search returns nothing. I know nothing about how the app works. Tell me what I would try next after reading it. If the honest answer is that I'd have no idea what to try, say that. Don't rewrite the message for me.
+
 - *What came back:*
+After reading it, you'd try a different search, but you'd be guessing. The message tells you what happened (nothing matched) and gives you one instruction ("try a different query"), but nothing about *what kind* of different.
+
+Here's what you'd likely do, in order:
+
+1. **Retype the same thing, maybe fixing a typo.** The first instinct is to suspect your own spelling.
+2. **Try fewer or simpler words.** If you searched "blue running shoes size 10," you'd probably drop it to "running shoes."
+3. **Try a synonym.** "Sneakers" instead of "running shoes."
+
+Past that, you'd have no idea. The message doesn't say whether the app searches titles only or everything, whether it wants exact matches, whether filters are silently narrowing your results, or whether the thing you want just isn't there. So you can't tell whether to change your wording, loosen a setting, or give up. And "No results found" doesn't distinguish between "your search was wrong" and "this content doesn't exist," so you may keep trying variations long after there's anything to find.
+
+So the honest answer: you'd have a vague sense to try simpler or different words, but no real direction. "Try a different query" is the app telling you to guess again.
+
 - *What I changed:*
+
+I implemented a nested if statement to output/save different messages to session depending which filter is too strict. The old implmentation just checked if the search_results were empty and output a generic try different query message.
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 

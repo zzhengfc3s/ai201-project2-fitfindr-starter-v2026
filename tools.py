@@ -107,7 +107,7 @@ def search_listings(
 
     scored_listings.sort(key=lambda x: x[0], reverse=True)
 
-    return scored_listings[:config.SEARCH_RESULT_LIMIT]
+    return [listing for score, listing in scored_listings[:config.SEARCH_RESULT_LIMIT]]
 
 
 # ── Tool 2: suggest_outfit ────────────────────────────────────────────────────

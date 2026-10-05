@@ -16,7 +16,8 @@ Build and test your three tools in `tools.py` first. Then come here.
 import config
 import trace
 from tools import search_listings, suggest_outfit, create_fit_card
-from generate import ModelUnavailable
+from generate import generate
+import re
 
 
 # ── session state ─────────────────────────────────────────────────────────────
@@ -106,9 +107,76 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         than a stack trace. The import is already at the top of this file.
     """
     session = new_session(query, wardrobe)
+    count = 0
+    
+    trace.check_iterations(count)
+    prompt = (
+        f"Parse this query into a description, and optionally a size, and/or a max_price: {query}\n"
+        f"Format:\n"
+        f"Description: <description>\n"
+        f"Size: <size> or 'None'\n"
+        f"Max Price: <max_price> or 'None'\n"
+        )
+    response = generate(prompt)
 
-    # TODO: delete these two lines and build the loop.
-    session["error"] = "The planning loop isn't built yet — see the TODO in agent.py."
+    desc_match = re.search(r"Description:\s*(.+)", response, re.IGNORECASE)
+    size_match = re.search(r"Size:\s*(.+)", response, re.IGNORECASE)
+    price_match = re.search(r"Max Price:\s*(.+)", response, re.IGNORECASE)
+
+    description = desc_match.group(1).strip() if desc_match else ""
+    size = size_match.group(1).strip() if size_match else None
+    max_price = price_match.group(1).strip() if price_match else None
+
+    if max_price is not None:
+        try:
+            max_price = float(re.sub(r'[^\d.]', '', max_price))
+        except ValueError:
+            max_price = None
+
+    parsed_query = {
+        "description": description,
+        "size": size if size and size.lower() != 'none' else None,
+        "max_price": max_price if max_price is not None else None
+    }
+
+    session["parsed"] = parsed_query
+
+    search_results = search_listings(session["parsed"]["description"], session["parsed"]["size"], session["parsed"]["max_price"])
+    session["search_results"] = search_results
+
+    if not search_results:
+        bad_price = False
+        bad_size = False
+        if max_price is not None:
+            results_price = search_listings(session["parsed"].get("description"), session["parsed"].get("size"), None)
+            if results_price:
+                bad_price = True
+        
+        if size is not None:
+            results_size = search_listings(session["parsed"].get("description"), None, session["parsed"].get("max_price"))
+            if results_size:
+                bad_size = True
+
+        if bad_price and bad_size:
+            session["error"] = "No results found. Try adjusting your price and size."
+        elif bad_price:
+            session["error"] = "No results found. Try increasing your max price."
+        elif bad_size:
+            session["error"] = "No results found. Try adjusting your size."
+        else:
+            session["error"] = "No results found. Try adjusting your query keywords."
+
+        return session
+
+    selected_item = session["search_results"][0]
+    session["selected_item"] = selected_item
+
+    outfit_suggestion = suggest_outfit(session["selected_item"], wardrobe)
+    session["outfit_suggestion"] = outfit_suggestion
+
+    fit_card = create_fit_card(session["outfit_suggestion"], session["selected_item"])
+    session["fit_card"] = fit_card
+    
     return session
 
 
