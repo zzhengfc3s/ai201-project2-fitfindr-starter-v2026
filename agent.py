@@ -17,6 +17,7 @@ import config
 import trace
 from tools import search_listings, suggest_outfit, create_fit_card
 from generate import generate
+from mcp_client import call_tool
 import re
 
 
@@ -141,7 +142,12 @@ def run_agent(query: str, wardrobe: dict) -> dict:
 
     session["parsed"] = parsed_query
 
-    search_results = search_listings(session["parsed"]["description"], session["parsed"]["size"], session["parsed"]["max_price"])
+    #search_results = search_listings(session["parsed"]["description"], session["parsed"]["size"], session["parsed"]["max_price"])
+    search_results = call_tool("search_listings", {
+        "description": session["parsed"]["description"],
+        "size": session["parsed"]["size"],
+        "max_price": session["parsed"]["max_price"],
+    })
     session["search_results"] = search_results
 
     if not search_results:
