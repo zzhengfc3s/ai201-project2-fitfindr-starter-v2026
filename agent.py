@@ -109,79 +109,101 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     """
     session = new_session(query, wardrobe)
     count = 0
-    
-    trace.check_iterations(count)
-    prompt = (
-        f"Parse this query into a description, and optionally a size, and/or a max_price: {query}\n"
-        f"Format:\n"
-        f"Description: <description>\n"
-        f"Size: <size> or 'None'\n"
-        f"Max Price: <max_price> or 'None'\n"
-        )
-    response = generate(prompt)
 
-    desc_match = re.search(r"Description:\s*(.+)", response, re.IGNORECASE)
-    size_match = re.search(r"Size:\s*(.+)", response, re.IGNORECASE)
-    price_match = re.search(r"Max Price:\s*(.+)", response, re.IGNORECASE)
+    try:
+        count += 1
+        trace.check_iterations(count)
+        prompt = (
+            f"Parse this query into a description, and optionally a size, and/or a max_price: {query}\n"
+            f"Format:\n"
+            f"Description: <description>\n"
+            f"Size: <size> or 'None'\n"
+            f"Max Price: <max_price> or 'None'\n"
+            )
+        response = generate(prompt)
 
-    description = desc_match.group(1).strip() if desc_match else ""
-    size = size_match.group(1).strip() if size_match else None
-    max_price = price_match.group(1).strip() if price_match else None
+        desc_match = re.search(r"Description:\s*(.+)", response, re.IGNORECASE)
+        size_match = re.search(r"Size:\s*(.+)", response, re.IGNORECASE)
+        price_match = re.search(r"Max Price:\s*(.+)", response, re.IGNORECASE)
 
-    if max_price is not None:
-        try:
-            max_price = float(re.sub(r'[^\d.]', '', max_price))
-        except ValueError:
-            max_price = None
+        description = desc_match.group(1).strip() if desc_match else ""
+        size = size_match.group(1).strip() if size_match else None
+        max_price = price_match.group(1).strip() if price_match else None
 
-    parsed_query = {
-        "description": description,
-        "size": size if size and size.lower() != 'none' else None,
-        "max_price": max_price if max_price is not None else None
-    }
-
-    session["parsed"] = parsed_query
-
-    #search_results = search_listings(session["parsed"]["description"], session["parsed"]["size"], session["parsed"]["max_price"])
-    search_results = call_tool("search_listings", {
-        "description": session["parsed"]["description"],
-        "size": session["parsed"]["size"],
-        "max_price": session["parsed"]["max_price"],
-    })
-    session["search_results"] = search_results
-
-    if not search_results:
-        bad_price = False
-        bad_size = False
         if max_price is not None:
-            results_price = search_listings(session["parsed"].get("description"), session["parsed"].get("size"), None)
-            if results_price:
-                bad_price = True
-        
-        if size is not None:
-            results_size = search_listings(session["parsed"].get("description"), None, session["parsed"].get("max_price"))
-            if results_size:
-                bad_size = True
+            try:
+                max_price = float(re.sub(r'[^\d.]', '', max_price))
+            except ValueError:
+                max_price = None
 
-        if bad_price and bad_size:
-            session["error"] = "No results found. Try adjusting your price and size."
-        elif bad_price:
-            session["error"] = "No results found. Try increasing your max price."
-        elif bad_size:
-            session["error"] = "No results found. Try adjusting your size."
-        else:
-            session["error"] = "No results found. Try adjusting your query keywords."
+        session["parsed"] = {
+            "description": description,
+            "size": size if size and size.lower() != 'none' else None,
+            "max_price": max_price if max_price is not None else None
+        }
+        trace.step("parsed_query", inputs=query, returned=str(session["parsed"]))
 
-        return session
+        count += 1
+        trace.check_iterations(count)
+        #search_results = search_listings(session["parsed"]["description"], session["parsed"]["size"], session["parsed"]["max_price"])
+        search_results = call_tool("search_listings", {
+            "description": session["parsed"]["description"],
+            "size": session["parsed"]["size"],
+            "max_price": session["parsed"]["max_price"],
+        })
+        session["search_results"] = search_results
+        trace.step("mcp_search_listings", inputs=str(session["parsed"]), returned=session["search_results"])
 
-    selected_item = session["search_results"][0]
-    session["selected_item"] = selected_item
+        count += 1
+        trace.check_iterations(count)
+        if not search_results:
+            bad_price = False
+            bad_size = False
+            if max_price is not None:
+                #results_price = search_listings(session["parsed"].get("description"), session["parsed"].get("size"), None)
+                results_price = call_tool("search_listings", {
+                    "description": session["parsed"].get("description"),
+                    "size": session["parsed"].get("size"),
+                    "max_price": None
+                })
+                if results_price:
+                    bad_price = True
+            
+            if size is not None:
+                #results_size = search_listings(session["parsed"].get("description"), None, session["parsed"].get("max_price"))
+                results_size = call_tool("search_listings", {
+                    "description": session["parsed"].get("description"),
+                    "size": None,
+                    "max_price": session["parsed"].get("max_price")
+                })
+                if results_size:
+                    bad_size = True
 
-    outfit_suggestion = suggest_outfit(session["selected_item"], wardrobe)
-    session["outfit_suggestion"] = outfit_suggestion
+            if bad_price and bad_size:
+                session["error"] = "No results found. Try adjusting your price and size."
+            elif bad_price:
+                session["error"] = "No results found. Try increasing your max price."
+            elif bad_size:
+                session["error"] = "No results found. Try adjusting your size."
+            else:
+                session["error"] = "No results found. Try adjusting your query keywords."
 
-    fit_card = create_fit_card(session["outfit_suggestion"], session["selected_item"])
-    session["fit_card"] = fit_card
+            return session
+        trace.step("branch_no_results", inputs=str(session["parsed"]), returned=session["error"])
+
+        session["selected_item"] = session["search_results"][0]
+
+        count += 1
+        trace.check_iterations(count)
+        session["outfit_suggestion"] = suggest_outfit(session["selected_item"], wardrobe)
+        trace.step("outfit_suggestion", inputs=str({"selected_item": str(session["selected_item"]), "wardrobe": wardrobe}), returned=session["outfit_suggestion"])
+
+        count += 1
+        trace.check_iterations(count)
+        session["fit_card"] = create_fit_card(session["outfit_suggestion"], session["selected_item"])
+        trace.step("session_fit_card", inputs=str({"outfit_suggestion": session["outfit_suggestion"], "selected_item": str(session["selected_item"])}), returned=session["fit_card"])
+    except Exception as e:
+        session["error"] = "Model Service Unavailable. Please try again later."
     
     return session
 

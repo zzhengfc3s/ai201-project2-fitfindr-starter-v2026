@@ -393,13 +393,73 @@ that produced it:
 **Happy path**
 
 ```
+$ python app.py ask '90s track jacket in size M'
 
+[1] parsed_query
+      in:  90s track jacket in size M
+      out: {'description': '90s track jacket', 'size': 'M', 'max_price': None}
+[2] mcp_search_listings
+      in:  {'description': '90s track jacket', 'size': 'M', 'max_price': None}
+      out: 4 items: 90s Track Jacket — Navy/White Stripe, 90s Leather Bomber — Black, 90s Silk Slip Dress — Floral, Midi Length … +1 more
+[3] branch_no_results
+      in:  {'description': '90s track jacket', 'size': 'M', 'max_price': None}
+[4] outfit_suggestion
+      in:  {'selected_item': "{'id': 'lst_004', 'title': '90s Track Jacket — Navy/White Stripe', 'description': 'Authenti…
+      out: Here are two outfit combinations featuring the **90s Track Jacket — Navy/White Stripe** and pieces from your w…
+[5] session_fit_card
+      in:  {'outfit_suggestion': 'Here are two outfit combinations featuring the **90s Track Jacket — Navy/White Stripe**…
+      out: Scored this vintage 90s Track Jacket — Navy/White Stripe on Poshmark for just $45.0, and it instantly unlocked…
+
+  Found:    90s Track Jacket — Navy/White Stripe — $45.0 on poshmark
+
+  Outfit:   Here are two outfit combinations featuring the **90s Track Jacket — Navy/White Stripe** and pieces from your wardrobe:
+
+### Outfit 1: The Ultimate 90s Streetwear Look
+* **Top:** White ribbed tank top
+* **Bottoms:** Baggy straight-leg jeans, dark wash
+* **Shoes:** Chunky white sneakers
+* **Accessories:** Black crossbody bag
+
+**Why it works:** 
+This look leans entirely into the vintage, athletic streetwear vibe of the track jacket. Layering the navy jacket zipped halfway over the fitted white tank creates a great contrast in proportions against the baggy, high-waisted dark wash jeans. 
+
+**How to style it:**
+Wear the track jacket slightly unzipped to show off the white tank underneath, which ties in with the white stripes on the sleeves and the chunky white sneakers. Let the jeans pool slightly over your sneakers for an authentic 90s slouch. Finish the look with the black crossbody bag worn across the chest for hands-free utility.
+
+***
+
+### Outfit 2: Sporty Meets Minimalist Prep
+* **Bottoms:** Wide-leg khaki trousers
+* **Accessories:** Brown leather belt
+* **Shoes:** Chunky white sneakers
+* *(Optional layering piece: White ribbed tank top tucked underneath)*
+
+**Why it works:**
+Mixing athletic pieces with tailored separates is a classic high-low styling trick. The navy track jacket brings a sporty edge, while the wide-leg khaki trousers and brown belt ground the outfit with a clean, minimal earth-tone base. 
+
+**How to style it:**
+Tuck a fitted top (like your white ribbed tank) into the khaki trousers, secure it with the brown leather belt, and wear the track jacket fully unzipped as an outer layer. Pair with the chunky white sneakers to keep the overall silhouette modern, relaxed, and effortlessly cool.
+
+  Fit card: Scored this vintage 90s Track Jacket — Navy/White Stripe on Poshmark for just $45.0, and it instantly unlocked the ultimate sporty-meets-minimalist prep vibe! I paired it with wide-leg khakis and chunky sneakers for an effortless high-low mix that feels so fresh. Sustainable style has never looked this cool. ✨
+
+0 model calls this session, 3 served from cache
 ```
 
 **Empty search**
 
 ```
+$ python app.py ask '...' --trace
+            
+[1] parsed_query
+      in:  ...
+      out: {'description': '', 'size': None, 'max_price': None}
+[2] mcp_search_listings
+      in:  {'description': '', 'size': None, 'max_price': None}
+      out: [] (empty)
 
+  No results found. Try adjusting your query keywords.
+
+0 model calls this session, 1 served from cache
 ```
 
 **On the MCP move:** <!-- what changed in your code, and whether anything
@@ -407,7 +467,8 @@ behaved differently afterwards. If the rewire didn't work, say exactly where it
 broke — the error text and the last thing that worked. That earns the point in
 full. -->
 
-
+Changed 3 search_listings call to MCP call tool("search_listings", ...),
+No change to the behavior.
 
 ---
 
