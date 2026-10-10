@@ -311,6 +311,33 @@ So the honest answer: you'd have a vague sense to try simpler or different words
 
 I implemented a nested if statement to output/save different messages to session depending which filter is too strict. The old implmentation just checked if the search_results were empty and output a generic try different query message.
 
+**Unit 4 Moment 1**
+
+- *What I asked for:*
+* No results found. Try adjusting your query keywords.
+* No results found. Try adjusting your query keywords.
+* ModelUnavailable: The model rejected your API key. Check GEMINI_API_KEY in your .env file, or create a fresh key at aistudio.google.com.
+
+Here are three error messages from an app I'm using. For each one, tell me what I would try next as a user who can't see the code. If a message leaves me with nothing to try, say so. Don't rewrite them for me.
+
+- *What came back:*
+```
+**1. "No results found. Try adjusting your query keywords."**
+You have something to try. Use fewer or more general words, check spelling, swap in synonyms, and remove any filters or date ranges you may have set. If the search is scoped to a folder, project, or category, widen it. The message is vague about *why* nothing matched, but it at least points you at the one thing you control, which is the query.
+
+**2. "No results found. Try adjusting your query keywords."** (same message again)
+Same steps apply, but the repeat tells you something. If you've already loosened the query and still get this, the problem is probably not your wording. Either the thing you want isn't in the data, or the search itself isn't working and is reporting "nothing" instead of "error." A good test is to search for something you know exists. If that also returns nothing, stop rewording and treat it as a broken search. Beyond that, your only move is to contact support or the developer, since the message gives you no way to tell "no match" apart from "search failed."
+
+**3. "ModelUnavailable: The model rejected your API key. Check GEMINI_API_KEY in your .env file, or create a fresh key at aistudio.google.com."**
+This one is written for the developer, not for you. Unless you're the person who runs the app, you can't see a `.env` file and can't fix the key. What you can do is report it: tell whoever maintains the app that the Gemini API key is being rejected. If you *are* the person who set the app up, the message is actually quite actionable: check the key in `.env` and generate a new one if needed. If you aren't, you have nothing to try beyond waiting and reporting it, and retrying won't help because a rejected key will keep failing.
+
+One connection worth noting: the third error could be the cause of the first two. If the app uses that model to run searches and the key is bad, it might show "no results" instead of surfacing the real error. That's a guess, but it's a reason to report all three together.
+```
+
+- *What I changed:*
+
+Added a try - exception block around my code. Now the error says "Model Service Unavailable. Please try again later."
+
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
      Don't fill these in during unit 3.
@@ -331,17 +358,264 @@ I implemented a nested if statement to output/save different messages to session
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. matching query completes | 4/5 | PASS | PASS | PASS | PASS | PASS | MET |
+| 2. impossible query stops early | 5/5 |  PASS | PASS  |  PASS | PASS  | PASS  | MET |
+| 3. selected item is in fit card | 5/5 | PASS | PASS | PASS | PASS | PASS | MET |
+| 4. fit card includes price and platform | 5/5 | PASS | PASS | PASS | PASS | PASS | MET |
+| 5. price filter | 5/5 | PASS | PASS | PASS | PASS | PASS | MET |
 
 **Real output from one try**, pasted as text, naming the file and function
 that produced it:
 
+Criterion 1:
+```
+**Try 5**
+
+- stopped early: no
+- selected_item: Y2K Baby Tee — Butterfly Print ($18.0, depop)
+- search_results: 10
+
+Outfit suggestion:
+
+```
+Here are two outfit combinations featuring the **Y2K Baby Tee — Butterfly Print** paired with items from your existing wardrobe:
+
+### Outfit 1: The Y2K Streetwear Contrast
+* **Thrifted Item:** Y2K Baby Tee — Butterfly Print
+* **Wardrobe Pieces:** 
+  * Baggy straight-leg jeans, dark wash
+  * Chunky white sneakers
+  * Black crossbody bag
+
+**Why it works & how to style it:**
+This outfit plays on the classic early-2000s silhouette by pairing a tightly fitted, cropped baby tee with voluminous, low-to-mid silhouette bottoms (since the jeans are high-waisted, they will sit nicely right at the hem of the baby tee, highlighting the waist). The white in the graphic and the pink/purple butterfly tones pop against the dark indigo wash of the denim. Tie the look together with the chunky white sneakers to lean into that retro streetwear aesthetic, and sling the black crossbody bag over your shoulder for an effortless, everyday look.
+
+---
+
+### Outfit 2: Edgy Casual (90s/Y2K Fusion)
+* **Thrifted Item:** Y2K Baby Tee — Butterfly Print
+* **Wardrobe Pieces:** 
+  * Vintage black denim jacket
+  * Wide-leg khaki trousers
+  * Black combat boots
+
+**Why it works & how to style it:**
+If you want to tone down the sweetness of the butterfly graphic and the pink/purple pastels, pairing the tee with rugged black pieces creates a great balance of feminine and edgy styles. The cropped baby tee looks great tucked into or sitting just above the waistband of the wide-leg khaki trousers, creating an intentional contrast between the fitted top and relaxed, earthy bottoms. Layer the slightly cropped vintage black denim jacket on top, and finish the outfit with black combat boots to ground the look with a touch of grunge.
 ```
 
+Fit card:
+
+```
+Channeling major Y2K streetwear energy with this cute butterfly baby tee I scored on Depop for just $18! Pairing it with baggy dark-wash jeans and chunky kicks gives that effortless, nostalgic contrast I live for. Honestly, thrift finds like this just hit different. ✨🦋
+```
+
+Trace:
+
+```
+[1] parsed_query
+      in:  vintage graphic tee under $30
+      out: {'description': 'vintage graphic tee', 'size': None, 'max_price': 30.0}
+[2] mcp_search_listings
+      in:  {'description': 'vintage graphic tee', 'size': None, 'max_price': 30.0}
+      out: 10 items: Y2K Baby Tee — Butterfly Print, Graphic Tee — 2003 Tour Bootleg Style, Vintage Band Tee — Faded Grey … +7 more
+[3] branch_no_results
+      in:  {'description': 'vintage graphic tee', 'size': None, 'max_price': 30.0}
+[4] outfit_suggestion
+      in:  {'selected_item': "{'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute ear…
+      out: Here are two outfit combinations featuring the **Y2K Baby Tee — Butterfly Print** paired with items from your …
+[5] session_fit_card
+      in:  {'outfit_suggestion': 'Here are two outfit combinations featuring the **Y2K Baby Tee — Butterfly Print** paire…
+      out: Channeling major Y2K streetwear energy with this cute butterfly baby tee I scored on Depop for just $18! Pairi…
+```
+```
+
+Criterion 2:
+```
+**Try 5**
+
+- stopped early: yes — No results found. Try adjusting your query keywords.
+- selected_item: (none)
+- search_results: 0
+
+Trace:
+
+```
+[1] parsed_query
+      in:  designer ballgown size XXS under $5
+      out: {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+[2] mcp_search_listings
+      in:  {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
+      out: [] (empty)
+```
+```
+
+Criterion 3:
+```
+**Try 5**
+
+- stopped early: no
+- selected_item: 90s Leather Bomber — Black ($75.0, depop)
+- search_results: 4
+
+Outfit suggestion:
+
+```
+Here are two distinct outfit suggestions for styling your 90s leather bomber jacket, leaning into its vintage, slightly grunge aesthetic:
+
+### Look 1: Model-Off-Duty Minimalist (90s Casual)
+*This look plays on proportions by pairing the boxy, oversized nature of the bomber with slimmer silhouettes underneath, creating an effortless, everyday vibe.*
+
+*   **Top:** A fitted, white ribbed crewneck baby tee or a simple black-and-white striped long-sleeve top.
+*   **Bottoms:** Mid-to-high-rise straight-leg medium-wash jeans with a slightly relaxed fit. 
+*   **Footwear:** Classic black leather loafers or retro sneakers (like Adidas Sambas or Onitsuka Tigers).
+*   **Accessories:** A minimalist black shoulder bag, thin silver hoop earrings, and oval sunglasses.
+
+### Look 2: Grungy Contrast (Edgy & Feminine)
+*This look contrasts the tough, rugged character of the genuine leather with softer, more delicate textures for a balanced, high-fashion grunge feel.*
+
+*   **Base:** A slip dress in a midi length (either in black, emerald green, or a subtle floral print) to play up that authentic 90s contrast. 
+*   **Footwear:** Chunky black combat boots (like Doc Martens) to anchor the outfit and tie in the edgy vibe of the jacket.
+*   **Accessories:** Layered silver chain necklaces, a distressed crossbody bag, and maybe sheer black tights if the weather is cool.
+```
+
+Fit card:
+
+```
+Channeling total model-off-duty energy with this thrifted 90s Leather Bomber in black, scored for just $75.0 on Depop! Pairing its oversized, vintage grunge vibe with a simple baby tee and straight-leg denim keeps the look effortlessly cool. Run, don't walk, to my shop to grab this piece before it’s gone!
+```
+
+Trace:
+
+```
+[1] parsed_query
+      in:  bomber jacket
+      out: {'description': 'bomber jacket', 'size': None, 'max_price': None}
+[2] mcp_search_listings
+      in:  {'description': 'bomber jacket', 'size': None, 'max_price': None}
+      out: 4 items: 90s Leather Bomber — Black, 90s Track Jacket — Navy/White Stripe, Denim Jacket — Light Wash, Cropped … +1 more
+[3] branch_no_results
+      in:  {'description': 'bomber jacket', 'size': None, 'max_price': None}
+[4] outfit_suggestion
+      in:  {'selected_item': "{'id': 'lst_022', 'title': '90s Leather Bomber — Black', 'description': 'Genuine leather bo…
+      out: Here are two distinct outfit suggestions for styling your 90s leather bomber jacket, leaning into its vintage,…
+[5] session_fit_card
+      in:  {'outfit_suggestion': 'Here are two distinct outfit suggestions for styling your 90s leather bomber jacket, le…
+      out: Channeling total model-off-duty energy with this thrifted 90s Leather Bomber in black, scored for just $75.0 o…
+```
+```
+
+Criterion 4:
+```
+**Try 5**
+
+- stopped early: no
+- selected_item: Platform Sneakers — White Chunky Sole ($48.0, poshmark)
+- search_results: 3
+
+Outfit suggestion:
+
+```
+Here are two distinct outfit suggestions that lean into the late 90s / early 2000s energy of these platform sneakers, while embracing the natural yellowing of the sole as part of that authentic vintage charm:
+
+### Look 1: The Off-Duty Pop Star (Y2K Streetwear)
+*Channel the late-90s music video aesthetic—think sporty, comfortable, but high-impact.*
+
+* **Bottoms:** Low-rise baggy cargo pants in olive green, khaki, or camouflage. 
+* **Top:** A fitted, ribbed baby tee in white or black with a retro graphic (or a pastel color like baby blue or light pink). 
+* **Outerwear:** An oversized nylon windbreaker or a cropped zip-up hoodie left slightly unzipped.
+* **Accessories:** A small nylon shoulder bag (baguette style), tinted frameless sunglasses, and a chunky claw clip holding a messy updo.
+
+### Look 2: Sporty Retro Casual (Skater / Campus Vibe)
+*A more everyday, wearable look that highlights the chunky silhouette of the sneakers.*
+
+* **Bottoms:** Distressed light-wash denim jorts (denim shorts ending just at the knee) or a pleated white tennis skirt with athletic socks pulled up to mid-calf.
+* **Top:** An oversized vintage band tee or a color-blocked jersey styled with a relaxed fit.
+* **Layering:** If it’s chilly, add an oversized denim jacket or a varsity jacket.
+* **Accessories:** A canvas tote bag, a baseball cap, and some simple silver hoop earrings. 
+
+**Styling Tip for the Yellowed Soles:** Lean into the vintage look! Pair these with distressed fabrics, vintage washes, and retro logos rather than pristine, ultra-modern minimalist pieces so the yellowing looks intentional and lived-in.
+```
+
+Fit card:
+
+```
+Stepping straight out of a 2000s music video in my dream off-duty pop star era! I scored these white chunky sole platform sneakers on Poshmark for just $48.0, and that naturally yellowed vintage look makes them feel so authentic. Paired with low-rise cargo pants and a baby tee, this Y2K streetwear fit is the ultimate throwback.
+```
+
+Trace:
+
+```
+[1] parsed_query
+      in:  platform sneakers
+      out: {'description': 'platform sneakers', 'size': None, 'max_price': None}
+[2] mcp_search_listings
+      in:  {'description': 'platform sneakers', 'size': None, 'max_price': None}
+      out: 3 items: Platform Sneakers — White Chunky Sole, Platform Mary Janes — Black Patent, Low-Top Canvas Sneakers — Off-White
+[3] branch_no_results
+      in:  {'description': 'platform sneakers', 'size': None, 'max_price': None}
+[4] outfit_suggestion
+      in:  {'selected_item': "{'id': 'lst_019', 'title': 'Platform Sneakers — White Chunky Sole', 'description': 'White c…
+      out: Here are two distinct outfit suggestions that lean into the late 90s / early 2000s energy of these platform sn…
+[5] session_fit_card
+      in:  {'outfit_suggestion': 'Here are two distinct outfit suggestions that lean into the late 90s / early 2000s ener…
+      out: Stepping straight out of a 2000s music video in my dream off-duty pop star era! I scored these white chunky so…
+```
+```
+
+Criterion 5:
+```
+**Try 5**
+
+- stopped early: no
+- selected_item: High-Waisted Denim Shorts — Cutoff ($24.0, poshmark)
+- search_results: 10
+
+Outfit suggestion:
+
+```
+Here are two versatile styling suggestions for these classic DIY Levi’s 501 cutoff shorts, ranging from casual daytime to effortless evening wear:
+
+### 1. The Casual 90s Vintage Look (Daytime / Errands)
+*Emphasize the vintage, effortless vibe of the shorts with classic basics and comfortable accessories.*
+
+*   **Top:** A tucked-in, slightly oversized plain white ribbed tank top or a vintage graphic t-shirt. 
+*   **Footwear:** Classic canvas low-top sneakers (like Converse or Vans) or retro leather trainers.
+*   **Layers:** An unbuttoned, lightweight oversized linen shirt worn open as a light layer.
+*   **Accessories:** A brown leather belt, a canvas tote bag, and retro oval sunglasses.
+
+### 2. Elevated Summer Chic (Sunset Drinks / Casual Dinner)
+*Dress up the raw-hem denim by pairing it with structured pieces and feminine textures.*
+
+*   **Top:** A sleek black or olive green bodysuit, or a cropped black linen blouse with puff sleeves.
+*   **Footwear:** Strappy leather flat sandals or comfortable leather mules.
+*   **Layers:** A lightweight gold chain necklace and simple hoop earrings to add a touch of polish.
+*   **Accessories:** A woven straw or rattan crossbody bag and a hair claw clip for an easy updo.
+```
+
+Fit card:
+
+```
+Scored these high-waisted denim shorts—cutoff for just $24 on Poshmark, and they are officially my whole personality this season! I paired them with a sleek black bodysuit, strappy sandals, and a claw clip for the ultimate sunset drinks look. Raw hem denim has never felt so effortlessly chic. ✨
+```
+
+Trace:
+
+```
+[1] parsed_query
+      in:  vintage denim under $30
+      out: {'description': 'vintage denim', 'size': None, 'max_price': 30.0}
+[2] mcp_search_listings
+      in:  {'description': 'vintage denim', 'size': None, 'max_price': 30.0}
+      out: 10 items: High-Waisted Denim Shorts — Cutoff, Straight Leg Black Jeans — Faded, Denim Vest — Medium Wash, Studded … +7 more
+[3] branch_no_results
+      in:  {'description': 'vintage denim', 'size': None, 'max_price': 30.0}
+[4] outfit_suggestion
+      in:  {'selected_item': '{\'id\': \'lst_016\', \'title\': \'High-Waisted Denim Shorts — Cutoff\', \'description\': "…
+      out: Here are two versatile styling suggestions for these classic DIY Levi’s 501 cutoff shorts, ranging from casual…
+[5] session_fit_card
+      in:  {'outfit_suggestion': 'Here are two versatile styling suggestions for these classic DIY Levi’s 501 cutoff shor…
+      out: Scored these high-waisted denim shorts—cutoff for just $24 on Poshmark, and they are officially my whole perso…
+```
 ```
 
 ---

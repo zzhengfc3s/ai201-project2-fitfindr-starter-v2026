@@ -35,6 +35,24 @@ SCENARIOS = [
         "wardrobe": "empty",
         "criterion": None,
     },
+    {
+        "name": "selected item is in fit card",
+        "query": "bomber jacket",
+        "wardrobe": "empty",
+        "criterion": 3,
+    },
+    {
+        "name": "fit card includes price and platform",
+        "query": "platform sneakers",
+        "wardrobe": "empty",
+        "criterion": 4,
+    },
+    {
+        "name": "price filter",
+        "query": "vintage denim under $30",
+        "wardrobe": "empty",
+        "criterion": 5,
+    },
     # TODO: add what your criteria 3, 4 and 5 need.
     #
     # Set "criterion" to the number in criteria.md that the scenario tests.
