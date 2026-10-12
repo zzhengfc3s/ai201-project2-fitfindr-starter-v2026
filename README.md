@@ -314,11 +314,13 @@ I implemented a nested if statement to output/save different messages to session
 **Unit 4 Moment 1**
 
 - *What I asked for:*
+```
 * No results found. Try adjusting your query keywords.
 * No results found. Try adjusting your query keywords.
 * ModelUnavailable: The model rejected your API key. Check GEMINI_API_KEY in your .env file, or create a fresh key at aistudio.google.com.
 
 Here are three error messages from an app I'm using. For each one, tell me what I would try next as a user who can't see the code. If a message leaves me with nothing to try, say so. Don't rewrite them for me.
+```
 
 - *What came back:*
 ```
@@ -385,7 +387,7 @@ I've read the full run log, so here is the case against each MET verdict, using 
 
 - *What I changed:*
 
-Nothing, I don't agree with Claude's assessment. However, I did try other single try queries to see if I could get a failure on some of the criterions. This lead me to improving the trace output diagnosis to see if I can find subtle failures/bugs I might have missed.
+Nothing, I don't agree with Claude's assessment. However, I did try several different single try queries to see if I could get a failure on some of the criterions. This lead me to improving the trace output diagnosis to see if I can find subtle failures/bugs I might have missed.
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
@@ -428,7 +430,7 @@ Criterion 1:
 
 Outfit suggestion:
 
-```
+``
 Here are two outfit combinations featuring the **Y2K Baby Tee — Butterfly Print** paired with items from your existing wardrobe:
 
 ### Outfit 1: The Y2K Streetwear Contrast
@@ -452,17 +454,17 @@ This outfit plays on the classic early-2000s silhouette by pairing a tightly fit
 
 **Why it works & how to style it:**
 If you want to tone down the sweetness of the butterfly graphic and the pink/purple pastels, pairing the tee with rugged black pieces creates a great balance of feminine and edgy styles. The cropped baby tee looks great tucked into or sitting just above the waistband of the wide-leg khaki trousers, creating an intentional contrast between the fitted top and relaxed, earthy bottoms. Layer the slightly cropped vintage black denim jacket on top, and finish the outfit with black combat boots to ground the look with a touch of grunge.
-```
+``
 
 Fit card:
 
-```
+``
 Channeling major Y2K streetwear energy with this cute butterfly baby tee I scored on Depop for just $18! Pairing it with baggy dark-wash jeans and chunky kicks gives that effortless, nostalgic contrast I live for. Honestly, thrift finds like this just hit different. ✨🦋
-```
+``
 
 Trace:
 
-```
+``
 [1] parsed_query
       in:  vintage graphic tee under $30
       out: {'description': 'vintage graphic tee', 'size': None, 'max_price': 30.0}
@@ -477,7 +479,7 @@ Trace:
 [5] session_fit_card
       in:  {'outfit_suggestion': 'Here are two outfit combinations featuring the **Y2K Baby Tee — Butterfly Print** paire…
       out: Channeling major Y2K streetwear energy with this cute butterfly baby tee I scored on Depop for just $18! Pairi…
-```
+``
 ```
 
 Criterion 2:
@@ -490,14 +492,14 @@ Criterion 2:
 
 Trace:
 
-```
+``
 [1] parsed_query
       in:  designer ballgown size XXS under $5
       out: {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
 [2] mcp_search_listings
       in:  {'description': 'designer ballgown', 'size': 'XXS', 'max_price': 5.0}
       out: [] (empty)
-```
+``
 ```
 
 Criterion 3:
@@ -510,7 +512,7 @@ Criterion 3:
 
 Outfit suggestion:
 
-```
+``
 Here are two distinct outfit suggestions for styling your 90s leather bomber jacket, leaning into its vintage, slightly grunge aesthetic:
 
 ### Look 1: Model-Off-Duty Minimalist (90s Casual)
@@ -527,17 +529,17 @@ Here are two distinct outfit suggestions for styling your 90s leather bomber jac
 *   **Base:** A slip dress in a midi length (either in black, emerald green, or a subtle floral print) to play up that authentic 90s contrast. 
 *   **Footwear:** Chunky black combat boots (like Doc Martens) to anchor the outfit and tie in the edgy vibe of the jacket.
 *   **Accessories:** Layered silver chain necklaces, a distressed crossbody bag, and maybe sheer black tights if the weather is cool.
-```
+``
 
 Fit card:
 
-```
+``
 Channeling total model-off-duty energy with this thrifted 90s Leather Bomber in black, scored for just $75.0 on Depop! Pairing its oversized, vintage grunge vibe with a simple baby tee and straight-leg denim keeps the look effortlessly cool. Run, don't walk, to my shop to grab this piece before it’s gone!
-```
+``
 
 Trace:
 
-```
+``
 [1] parsed_query
       in:  bomber jacket
       out: {'description': 'bomber jacket', 'size': None, 'max_price': None}
@@ -552,7 +554,7 @@ Trace:
 [5] session_fit_card
       in:  {'outfit_suggestion': 'Here are two distinct outfit suggestions for styling your 90s leather bomber jacket, le…
       out: Channeling total model-off-duty energy with this thrifted 90s Leather Bomber in black, scored for just $75.0 o…
-```
+``
 ```
 
 Criterion 4:
@@ -565,7 +567,7 @@ Criterion 4:
 
 Outfit suggestion:
 
-```
+``
 Here are two distinct outfit suggestions that lean into the late 90s / early 2000s energy of these platform sneakers, while embracing the natural yellowing of the sole as part of that authentic vintage charm:
 
 ### Look 1: The Off-Duty Pop Star (Y2K Streetwear)
@@ -585,17 +587,17 @@ Here are two distinct outfit suggestions that lean into the late 90s / early 200
 * **Accessories:** A canvas tote bag, a baseball cap, and some simple silver hoop earrings. 
 
 **Styling Tip for the Yellowed Soles:** Lean into the vintage look! Pair these with distressed fabrics, vintage washes, and retro logos rather than pristine, ultra-modern minimalist pieces so the yellowing looks intentional and lived-in.
-```
+``
 
 Fit card:
 
-```
+``
 Stepping straight out of a 2000s music video in my dream off-duty pop star era! I scored these white chunky sole platform sneakers on Poshmark for just $48.0, and that naturally yellowed vintage look makes them feel so authentic. Paired with low-rise cargo pants and a baby tee, this Y2K streetwear fit is the ultimate throwback.
-```
+``
 
 Trace:
 
-```
+``
 [1] parsed_query
       in:  platform sneakers
       out: {'description': 'platform sneakers', 'size': None, 'max_price': None}
@@ -610,7 +612,7 @@ Trace:
 [5] session_fit_card
       in:  {'outfit_suggestion': 'Here are two distinct outfit suggestions that lean into the late 90s / early 2000s ener…
       out: Stepping straight out of a 2000s music video in my dream off-duty pop star era! I scored these white chunky so…
-```
+``
 ```
 
 Criterion 5:
@@ -623,7 +625,7 @@ Criterion 5:
 
 Outfit suggestion:
 
-```
+``
 Here are two versatile styling suggestions for these classic DIY Levi’s 501 cutoff shorts, ranging from casual daytime to effortless evening wear:
 
 ### 1. The Casual 90s Vintage Look (Daytime / Errands)
@@ -641,17 +643,17 @@ Here are two versatile styling suggestions for these classic DIY Levi’s 501 cu
 *   **Footwear:** Strappy leather flat sandals or comfortable leather mules.
 *   **Layers:** A lightweight gold chain necklace and simple hoop earrings to add a touch of polish.
 *   **Accessories:** A woven straw or rattan crossbody bag and a hair claw clip for an easy updo.
-```
+``
 
 Fit card:
 
-```
+``
 Scored these high-waisted denim shorts—cutoff for just $24 on Poshmark, and they are officially my whole personality this season! I paired them with a sleek black bodysuit, strappy sandals, and a claw clip for the ultimate sunset drinks look. Raw hem denim has never felt so effortlessly chic. ✨
-```
+``
 
 Trace:
 
-```
+``
 [1] parsed_query
       in:  vintage denim under $30
       out: {'description': 'vintage denim', 'size': None, 'max_price': 30.0}
@@ -666,7 +668,7 @@ Trace:
 [5] session_fit_card
       in:  {'outfit_suggestion': 'Here are two versatile styling suggestions for these classic DIY Levi’s 501 cutoff shor…
       out: Scored these high-waisted denim shorts—cutoff for just $24 on Poshmark, and they are officially my whole perso…
-```
+``
 ```
 
 ---
@@ -806,7 +808,7 @@ No change to the behavior.
 
 **What I changed:**
 
-Changed 3 trace.steps in agent.py
+Changed 3 trace.steps (mcp_search_listing, outfit_suggestion, session_fit_card) in agent.py
 
 **Which failure it was meant to fix:**
 
@@ -857,7 +859,8 @@ All criterions still pass, was not able to find failure.
 
 ## Stretch Feature: Second/Third MCP Tool
 
-**On the MCP Move**
+**On the MCP Move:**
+
 Change both outfit_suggestion and create_fit_card function call to mcp tool calls. Did one function at a time then ran a quick run_eval with only 1 try to make sure each mcp move is working. Did not notice any change in behavior for agent.py::run_agent.
 ---
 
