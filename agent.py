@@ -152,7 +152,13 @@ def run_agent(query: str, wardrobe: dict) -> dict:
             "max_price": session["parsed"]["max_price"],
         })
         session["search_results"] = search_results
-        trace.step("mcp_search_listings", inputs=str(session["parsed"]), returned=session["search_results"])
+        prices = [item.get("price") for item in search_results if "price" in item]
+        trace.step("mcp_search_listings", inputs=str(session["parsed"]),
+                   returned=str({
+                       "count": len(search_results),
+                       "prices": prices,
+                       "1st item": search_results[0] if search_results else None})
+                   )
 
         count += 1
         trace.check_iterations(count)
@@ -196,12 +202,27 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         count += 1
         trace.check_iterations(count)
         session["outfit_suggestion"] = suggest_outfit(session["selected_item"], wardrobe)
-        trace.step("outfit_suggestion", inputs=str({"selected_item": str(session["selected_item"]), "wardrobe": wardrobe}), returned=session["outfit_suggestion"])
+        trace.step("outfit_suggestion",
+                   inputs=str({
+                       "selected_item_id": session["selected_item"].get("id"),
+                       "selected_item_title": session["selected_item"].get("title"),
+                       "wardrobe_count": len(wardrobe)
+                       }),
+                   returned=session["outfit_suggestion"])
 
         count += 1
         trace.check_iterations(count)
         session["fit_card"] = create_fit_card(session["outfit_suggestion"], session["selected_item"])
-        trace.step("session_fit_card", inputs=str({"outfit_suggestion": session["outfit_suggestion"], "selected_item": str(session["selected_item"])}), returned=session["fit_card"])
+        trace.step("session_fit_card",
+                   inputs=str({
+                       "selected_item_id": session["selected_item"].get("id"),
+                       "outfit_suggestion": session["outfit_suggestion"]
+                       }),
+                   returned=session["fit_card"],
+                   note={
+                       "expected_price": session["selected_item"].get("price"),
+                       "expected_platform": session["selected_item"].get("platform")
+                   })
     except Exception as e:
         session["error"] = "Model Service Unavailable. Please try again later."
     
