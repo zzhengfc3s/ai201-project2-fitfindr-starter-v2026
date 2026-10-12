@@ -146,26 +146,25 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         count += 1
         trace.check_iterations(count)
         #search_results = search_listings(session["parsed"]["description"], session["parsed"]["size"], session["parsed"]["max_price"])
-        search_results = call_tool("search_listings", {
+        session["search_results"] = call_tool("search_listings", {
             "description": session["parsed"]["description"],
             "size": session["parsed"]["size"],
             "max_price": session["parsed"]["max_price"],
         })
-        session["search_results"] = search_results
-        prices = [item.get("price") for item in search_results if "price" in item]
+        prices = [item.get("price") for item in session["search_results"] if "price" in item]
         trace.step("mcp_search_listings", inputs=str(session["parsed"]),
                    returned=str({
-                       "count": len(search_results),
+                       "count": len(session["search_results"]),
                        "prices": prices,
-                       "1st item": search_results[0] if search_results else None})
+                       "1st item": session["search_results"][0] if session["search_results"] else None})
                    )
 
         count += 1
         trace.check_iterations(count)
-        if not search_results:
+        if not session["search_results"]:
             bad_price = False
             bad_size = False
-            if max_price is not None:
+            if session["parsed"].get("max_price") is not None:
                 #results_price = search_listings(session["parsed"].get("description"), session["parsed"].get("size"), None)
                 results_price = call_tool("search_listings", {
                     "description": session["parsed"].get("description"),
@@ -175,7 +174,7 @@ def run_agent(query: str, wardrobe: dict) -> dict:
                 if results_price:
                     bad_price = True
             
-            if size is not None:
+            if session["parsed"].get("size") is not None:
                 #results_size = search_listings(session["parsed"].get("description"), None, session["parsed"].get("max_price"))
                 results_size = call_tool("search_listings", {
                     "description": session["parsed"].get("description"),
@@ -201,18 +200,26 @@ def run_agent(query: str, wardrobe: dict) -> dict:
 
         count += 1
         trace.check_iterations(count)
-        session["outfit_suggestion"] = suggest_outfit(session["selected_item"], wardrobe)
+        #session["outfit_suggestion"] = suggest_outfit(session["selected_item"], session["wardrobe"])
+        session["outfit_suggestion"] = call_tool("suggest_outfit", {
+            "new_item": session["selected_item"],
+            "wardrobe": session["wardrobe"]
+        })
         trace.step("outfit_suggestion",
                    inputs=str({
                        "selected_item_id": session["selected_item"].get("id"),
                        "selected_item_title": session["selected_item"].get("title"),
-                       "wardrobe_count": len(wardrobe)
+                       "wardrobe_count": len(session["wardrobe"])
                        }),
                    returned=session["outfit_suggestion"])
 
         count += 1
         trace.check_iterations(count)
-        session["fit_card"] = create_fit_card(session["outfit_suggestion"], session["selected_item"])
+        #session["fit_card"] = create_fit_card(session["outfit_suggestion"], session["selected_item"])
+        session["fit_card"] = call_tool("create_fit_card", {
+            "outfit": session["outfit_suggestion"],
+            "new_item": session["selected_item"]
+        })
         trace.step("session_fit_card",
                    inputs=str({
                        "selected_item_id": session["selected_item"].get("id"),

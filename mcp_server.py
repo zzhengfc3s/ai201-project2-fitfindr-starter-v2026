@@ -60,6 +60,9 @@ works with a direct call, and **a documented failure earns the point in full.**
 from mcp.server.fastmcp import FastMCP
 
 from tools import search_listings as _search_listings_impl  # noqa: F401 — you'll use this below
+from tools import suggest_outfit as _suggest_outfit_impl
+from tools import create_fit_card as _create_fit_card_impl
+
 
 # log_level="WARNING" keeps the server from printing an INFO line for every
 # request. Without it your terminal fills with "Processing request of type
@@ -79,10 +82,37 @@ def search_listings(
     Search the listings data for items matching the input's description, and optional size and a max price filter if available.
 
     Returns:
-        A list of matching listing dicts, best match first, each with 'title', 'description', 'category', 'style_tags', 'size', 'price', 'color', 'brand', 'platform'.
+        A list of dicts, best match first, each with 'title', 'description', 'category', 'style_tags', 'size', 'price', 'color', 'brand', 'platform'.
         If no matches are found, returns an empty list. not None, and not an exception.
     """
     return _search_listings_impl(description, size, max_price)
+
+@mcp.tool()
+def suggest_outfit(
+    new_item: dict,
+    wardrobe: dict,
+) -> str:
+    """
+    Suggest one or two outfits from the user's wardrobe with the new item.
+
+    Returns:
+        A non-empty string with outfit suggestions.
+    """
+    return _suggest_outfit_impl(new_item, wardrobe)
+
+@mcp.tool()
+def create_fit_card(
+    outfit: str,
+    new_item: dict
+) -> str:
+    """
+    Write a short caption about the new outfit and the vibe that the user can post on social media.
+
+    Returns:
+        A non-empty string of couple sentences that includes the item, price, and platform.
+        If outfit is empty, returns a fail message instead of calling the model.
+    """
+    return _create_fit_card_impl(outfit, new_item)
 #
 # ──────────────────────────────────────────────────────────────────────────────
 #
@@ -98,7 +128,6 @@ def search_listings(
 # are not optional here. `description: str` becomes a required string;
 # `max_price: float | None = None` becomes an optional number. Getting these
 # wrong is the most common reason a call is rejected.
-
 
 if __name__ == "__main__":
     mcp.run()

@@ -70,7 +70,7 @@ Search the listings data for items matching the input's description, and optiona
 'size' (string) or (None)
 'max_price' (float) or (None)
 - **Returns:**
-A list of matching listing dicts, best match first, each with 'title', 'description', 'category', 'style_tags', 'size', 'price', 'color', 'brand', 'platform'.
+A list of dicts, best match first, each with 'title', 'description', 'category', 'style_tags', 'size', 'price', 'color', 'brand', 'platform'.
 - **When it has nothing:**
 Returns an empty list. not None, and not an exception.
 
@@ -337,6 +337,55 @@ One connection worth noting: the third error could be the cause of the first two
 - *What I changed:*
 
 Added a try - exception block around my code. Now the error says "Model Service Unavailable. Please try again later."
+
+**Unit 4 Moment 2**
+
+Based on the 5 criterion above. Here is my target, my five tries, the run logs, and the verdict I reached. Argue the opposite verdict as strongly as you can.
+
+Criterion 1: Target: 4/5, Tries: 5/5, Verdict: MET
+Criterion 2: Target: 5/5, Tries: 5/5, Verdict: MET
+Criterion 3: Target: 5/5, Tries: 5/5, Verdict: MET
+Criterion 4: Target: 5/5, Tries: 5/5, Verdict: MET
+Criterion 5: Target: 5/5, Tries: 5/5, Verdict: MET
+
+- *What came back:*
+```
+I've read the full run log, so here is the case against each MET verdict, using only what the log shows.
+
+**Criterion 1: MISSED, not MET**
+- The criterion says "completes all three tool calls." Every run logs a fourth step, `branch_no_results`, with identical inputs to the search and no output, even when 10 results came back. The log can't tell whether the guard passed or fired and was ignored.
+- On the impossible query, the trace stops after the search with no `branch_no_results` step. So the early stop doesn't come from that branch, and you don't know what the guard does.
+- Five identical runs aren't evidence of a working pipeline. Try 1 to Try 5 all pick `lst_002` first, at temperature 0.9. That looks like "take result #1," not a selection.
+
+**Criterion 2: MISSED (0/5 on the second half)**
+- The criterion requires a message "naming what to change." All five runs return "No results found. Try adjusting your query keywords."
+- That names nothing specific. The query had three constraints: the description, size XXS and a $5 ceiling. The message doesn't say which to loosen.
+- It points at "keywords," which is plausibly the wrong lever, since size and price are the more obvious culprits. Not calling `suggest_outfit` is only the first half of the criterion.
+
+**Criterion 3: MISSED**
+- Your criterion says the selected item goes to the next two tool calls. In the trace, `outfit_suggestion` receives `selected_item`. But `session_fit_card` shows `outfit_suggestion` as its input key in 25 of 25 runs, and `selected_item` never appears. That is one call fed the item, not two.
+- The log truncates inputs at about 100 characters, so you can't claim the item was passed at all.
+- The log's own row label is "selected item is in fit card," which is a different test from the one you wrote. Judging the item name in the caption is a weaker check than judging what was passed to the tool.
+- The ranking is also the same every time (`lst_022` first), so this can't distinguish "passed the selected item" from "passed result #1."
+
+**Criterion 4: MISSED**
+- The 5/5 comes from one item (`lst_019`, poshmark, $48). It proves nothing about depop or thredUp captions.
+- The price shows up as the raw float "$48.0" in four of five runs. A caption a seller would never write is a leaking float, not a formatted price.
+- The query contains the word "platform." One caption reads "hunting on platform poshmark," and the bomber captions elsewhere in the log say "my platform depop" or "my shop." The platform name is being mangled, which suggests a lenient check.
+- The fit-card tool's visible input is only the outfit text, so you can't tell where price and platform come from. That makes a 5/5 look like luck.
+
+**Criterion 5: MISSED**
+- The trace prints only three of the ten returned titles per run, so seven of ten items are never shown. You've verified 3 of 10 prices, and only for the selected item's neighbours.
+- The log prints no returned prices, so the "every item ≤ $30" check is unverified for most of the results.
+- You tested one query, with one ceiling.
+- `lst_037` ($30) is on the boundary. It appears in the log, but nothing shows it was tested as in or out.
+
+**How strong each case is:** Criterion 2 is the strongest, because the message really doesn't name what to change. Criterion 3 is second, because the fit-card input never shows the item. Criterion 5 is next, because most prices are unseen. Criterion 4 is the weakest, since the price and platform are in all five captions. Criterion 1 is weak too, since all three calls clearly happened.
+```
+
+- *What I changed:*
+
+Nothing, I don't agree with Claude's assessment. However, I did try other single try queries to see if I could get a failure on some of the criterions. This lead me to improving the trace output diagnosis to see if I can find subtle failures/bugs I might have missed.
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
@@ -782,13 +831,43 @@ All criterions still pass, was not able to find failure. It did help in reviewin
 
 ---
 
+## Stretch Feature: Second Improvement
+
+**What I changed:**
+
+Fixed some agent.py code that weren't using session data to use session data instead or raw locals. 
+
+**Which failure it was meant to fix:**
+
+It was not meant to fix any failure but based on feedback from Unit 3. I wanted to make sure to get any possible edge cases.
+
+### Run Log — After
+
+| Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
+|---|---|---|---|---|---|---|---|
+| 1. matching query completes | 4/5 | PASS | PASS | PASS | PASS | PASS | MET |
+| 2. impossible query stops early | 5/5 |  PASS | PASS  |  PASS | PASS  | PASS  | MET |
+| 3. selected item is in fit card | 5/5 | PASS | PASS | PASS | PASS | PASS | MET |
+| 4. fit card includes price and platform | 5/5 | PASS | PASS | PASS | PASS | PASS | MET |
+| 5. price filter | 5/5 | PASS | PASS | PASS | PASS | PASS | MET |
+
+**Did it help, and how do I know:**
+
+All criterions still pass, was not able to find failure.
+
+## Stretch Feature: Second/Third MCP Tool
+
+**On the MCP Move**
+Change both outfit_suggestion and create_fit_card function call to mcp tool calls. Did one function at a time then ran a quick run_eval with only 1 try to make sure each mcp move is working. Did not notice any change in behavior for agent.py::run_agent.
+---
+
 ## What's Still Broken
 
 <!-- For each criterion still missed: what you'd do, and why you stopped where
      you did. "I ran out of time" is fine if it's true. Pretending nothing is
      left is not. -->
 
-
+All criterions passed. I stopped because ran out of time to test further to failure any edge case failures. If I were to keep going, I'd try testing the criterions with different queries.
 
 <!-- ═════════════════════════════════════════════════════════════════════
 
